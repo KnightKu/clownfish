@@ -26,6 +26,8 @@ from pylcommon import watched_io
 DISTRO_RHEL6 = "rhel6"
 # OS distribution RHEL7/CentOS7
 DISTRO_RHEL7 = "rhel7"
+# OS distribution RHEL8/CentOS8
+DISTRO_RHEL8 = "rhel8"
 # The shortest time that a reboot could finish. It is used to check whether
 # a host has actually rebooted or not.
 SHORTEST_TIME_REBOOT = 10
@@ -254,6 +256,9 @@ class SSHHost(object):
                 elif "el6" in ret.cr_stdout:
                     self.sh_cached_distro = DISTRO_RHEL6
                     return DISTRO_RHEL6
+                elif "el8" in ret.cr_stdout:
+                    self.sh_cached_distro = DISTRO_RHEL8
+                    return DISTRO_RHEL8
                 else:
                     return None
 
@@ -284,6 +289,9 @@ class SSHHost(object):
             elif version.startswith("6"):
                 self.sh_cached_distro = DISTRO_RHEL6
                 return DISTRO_RHEL6
+            elif version.startswith("8"):
+                self.sh_cached_distro = DISTRO_RHEL8
+                return DISTRO_RHEL8
             else:
                 log.cl_error("unsupported version [%s] of [%s] on host [%s]",
                              version, "rhel", self.sh_hostname)
@@ -1798,7 +1806,7 @@ class SSHHost(object):
         Example of kernel string:
         /boot/vmlinuz-2.6.32-573.22.1.el6_lustre.2.7.15.3.x86_64
         """
-        if self.sh_distro(log) == DISTRO_RHEL7:
+        if self.sh_distro(log) in [DISTRO_RHEL7, DISTRO_RHEL8]:
             # This is not necessary for normal cases, but just in case of
             # broken grubenv file caused by repair
             command = ("grub2-editenv create")
